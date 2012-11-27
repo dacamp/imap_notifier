@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'highline/import'
+require 'net/imap'
+require 'ruby-growl'
+
+def get_pass(prompt="Enter Password:")
+  ask(prompt) { |q| q.echo = false }
+end
+
+def grr(title, body)
+  g = Growl.new "localhost", "mutt"
+  g.add_notification "Mutt Mail Notification"
+  g.notify "Mutt Mail Notification", title, body
+end
+
+user = <username@domain>
+passwd = get_pass();
+
+# Set up for GMail
+imap = Net::IMAP.new('imap.gmail.com',993,true)
+imap.login(user, passwd)
+
+# Create as many Folders as you need here
+folders = Hash.new
+folder['INBOX'] = Array.new
+
+begin
+  folders.each do |f, ids|
+    imap.examine("#{f}")
+    mails = imap.search(["UNSEEN"])
+
+    if mails.count > 5
+      unless ids.first and ids.first.to_i >= mails.count.to_i
+        grr("New Mail in #{f}!", "You have #{mails.count} new mails!")
+      end
+      ids.clear
+      ids << mails.count
+    else
+      mails.each do |msg_id|
+        msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
+        next if ids.include?(msg.message_id)
+        ids << msg.message_id
+        grr("Mail from #{msg.sender.first.mailbox}", "#{msg.subject}")
+      end
+    end
+  end
+  sleep 30
+rescue EOFError => e
+  imap = Net::IMAP.new('imap.gmail.com',993,true)
+  imap.login(user, passwd)
+end while true
+
