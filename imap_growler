@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'highline/import'
 require 'net/imap'
+require 'highline/import'
 require 'ruby-growl'
 
 def get_pass(prompt="Enter Password:")
@@ -24,7 +24,7 @@ imap.login(user, passwd)
 
 # Create as many Folders as you need here
 folders = Hash.new
-folder['INBOX'] = Array.new
+folders['INBOX'] = Array.new
 
 begin
   folders.each do |f, ids|
