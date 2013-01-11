@@ -1,54 +1,93 @@
-#!/usr/bin/env ruby
-
+#!/usr/bin/env ruby # ruby 1.9.3p327
 require 'rubygems'
-require 'net/imap'
 require 'highline/import'
+require 'net/imap'
 require 'ruby-growl'
+require 'daemons'
 
-def get_pass(prompt="Enter Password:")
+VERSION  = "IMAP Growler 1.0"
+SLEEP    = 30
+
+@g = Growl.new("localhost", VERSION)
+logfile  = '/tmp/logfile'
+debug    = false
+too_many = 5 # Limit the number of individual new mails you want to know about
+imap_server = "imap.gmail.com" # could be anything with tweaks
+
+class Object
+  def returning(value)
+    yield(value)
+    value
+  end
+end
+
+def get_pass(prompt="Enter Password: ")
   ask(prompt) { |q| q.echo = false }
 end
 
 def grr(title, body)
-  g = Growl.new "localhost", "mutt"
-  g.add_notification "Mutt Mail Notification"
-  g.notify "Mutt Mail Notification", title, body
+  @g.add_notification VERSION
+  @g.notify VERSION, title, body
 end
 
-user = <username@domain>
+user = # Your email address
 passwd = get_pass();
+puts "Connecting..." if debug
 
-# Set up for GMail
-imap = Net::IMAP.new('imap.gmail.com',993,true)
-imap.login(user, passwd)
+folders = returning Hash.new do |f|
+  # Add any other directory you want to monitor here
+  f["INBOX"] = Array.new
+end
 
-# Create as many Folders as you need here
-folders = Hash.new
-folders['INBOX'] = Array.new
-
-begin
-  folders.each do |f, ids|
-    imap.examine("#{f}")
-    mails = imap.search(["UNSEEN"])
-
-    if mails.count > 5
-      unless ids.first and ids.first.to_i >= mails.count.to_i
-        grr("New Mail in #{f}!", "You have #{mails.count} new mails!")
-      end
-      ids.clear
-      ids << mails.count
-    else
-      mails.each do |msg_id|
-        msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
-        next if ids.include?(msg.message_id)
-        ids << msg.message_id
-        grr("Mail from #{msg.sender.first.mailbox}", "#{msg.subject}")
-      end
-    end
-  end
-  sleep 30
-rescue EOFError => e
-  imap = Net::IMAP.new('imap.gmail.com',993,true)
+pid = fork do
+  imap = Net::IMAP.new(imap_server, { :port => 993, :ssl => true } )
   imap.login(user, passwd)
-end while true
+  grr("Success!", "Connected #{user}")
 
+  begin
+    folders.each do |f, ids|
+      imap.examine("#{f}")
+
+      p "Mailbox: #{f}" if debug
+      unseen          = imap.search(["UNSEEN"])
+      ungrowled       = unseen - ids
+      ungrowled_count = ungrowled.length
+      p "All unseen mail ids: #{unseen}",
+      "All ungrowled mail ids: #{ungrowled}",
+      "Ungrowled count: #{ungrowled_count}" if debug
+
+      if ungrowled_count > too_many
+        p "New Mail in #{f}!",
+        "New: #{ungrowled_count}\nTotal: #{unseen.length}" if debug
+        grr("New Mail in #{f}!", "New: #{ungrowled_count}")
+      else
+        ungrowled.each do |msg_id|
+          msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
+          next if ids.include?(msg.message_id)
+          p "Growled about #{msg.message_id}" if debug
+          grr("Mail from #{msg.sender.first.mailbox}", "#{msg.subject}")
+        end
+      end
+      folders[f] = unseen
+    end
+    sleep SLEEP
+  rescue Interrupt
+    grr("Goodbye!", '')
+    raise
+  rescue EOFError
+    imap.login(user, passwd)
+  rescue Exception => err
+    p "Class: #{err.class}",
+      "Message: #{err.message}",
+      "See #{logfile} for more info." if debug
+    grr("#{err.class} error!", '')
+
+    File.open(logfile, 'w') { |fh|
+      fh.puts Time.now
+      fh.puts err.class
+      fh.puts err.message
+      err.backtrace.map{ |e| fh.puts e }
+    }
+    raise
+  end while true
+end
