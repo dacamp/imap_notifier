@@ -3,7 +3,6 @@ require 'rubygems'
 require 'highline/import'
 require 'net/imap'
 require 'ruby-growl'
-require 'daemons'
 
 VERSION  = "IMAP Growler 1.0"
 SLEEP    = 30
