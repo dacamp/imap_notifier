@@ -1,6 +1,7 @@
-#!/bin/env ruby
-source "https://rubygems.org"
-ruby "1.9.3"
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in imap_notifier.gemspec
+gemspec
 
 if `uname`.strip == 'Darwin'
    if `sw_vers -productVersion`.strip >= '10.8'

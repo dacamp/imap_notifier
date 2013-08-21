@@ -1,12 +1,21 @@
+PATH
+  remote: .
+  specs:
+    imap_notifier (0.2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
     highline (1.6.19)
+    rake (10.1.0)
     terminal-notifier (1.4.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  bundler (~> 1.3)
   highline
+  imap_notifier!
+  rake
   terminal-notifier
