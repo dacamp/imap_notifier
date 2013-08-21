@@ -2,13 +2,23 @@ PATH
   remote: .
   specs:
     imap_notifier (0.2.0)
+      highline
+      ruby-growl
+      terminal-notifier
 
 GEM
   remote: https://rubygems.org/
   specs:
     highline (1.6.19)
+    macaddr (1.6.1)
+      systemu (~> 2.5.0)
     rake (10.1.0)
+    ruby-growl (4.0)
+      uuid (~> 2.3, >= 2.3.5)
+    systemu (2.5.2)
     terminal-notifier (1.4.2)
+    uuid (2.3.7)
+      macaddr (~> 1.0)
 
 PLATFORMS
   ruby
