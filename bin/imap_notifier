@@ -1,0 +1,69 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path('../../lib', __FILE__)
+require 'imap_notifier'
+require 'optparse'
+
+opts = {}
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner   = "Usage: #{opt.program_name} [OPTIONS]"
+  opt.program_name = "IMAP Notifier"
+  opt.separator  "Options:"
+  opt.on('-h', '--help', 'Display this message') do
+    puts opt_parser
+    exit
+  end
+
+  opt.on('-V', '--version', "Display '#{opt.program_name} #{IMAP_Notifier::VERSION}' and exit") do
+    puts opt.program_name << ' ' << IMAP_Notifier::VERSION
+    exit
+  end
+
+  opt.on('-v', '--debug', "Write debug output into #{DEBUGFILE}") do
+    opts[:debug] = true
+  end
+
+  opt.on('-f', '--file FILE', "Read configuration file. [DEFAULT: ~/.imap_notifier]") do |c|
+    opts[:config] = c
+  end
+
+  opt.on('-s','--server STR', "Specify imap server. [Default: #{$imap_server}]") do |s|
+    $imap_server = s
+  end
+
+  opt.on('-d','--domain STR',
+      "Specify email domain. [Default: #{$imap_server.split('.').pop(2).join('.')}]") do |d|
+    opts[:domain] = d.gsub('@','')
+  end
+
+  opt.on('-u','--user STR', "Specify user login. [Default: ENV['USER']]") do |d|
+    opts[:domain] = d.gsub('@','')
+  end
+
+  opt.on('-m','--max INT', "Max mail mentioned before grouping them together. [Default: #{MAX_MAIL}]") do |m|
+    opts[:max] = m.to_i
+  end
+
+  opt.on('-k', '--kill', "Kill currently running #{opt.program_name} process with SIGINT") do
+    begin
+      pid = IO.readlines(PIDFILE).first.to_i
+      puts "Killing PID: #{pid}"
+      Process.kill("SIGINT", pid)
+    rescue Errno::ESRCH, Errno::ENOENT => e
+      puts "#{e.message} - Exiting..."
+    ensure
+      File.delete(PIDFILE) if File.exists?(PIDFILE)
+    end
+    exit
+  end
+end
+
+opt_parser.parse!
+
+if File.exists?(PIDFILE) && IO.readlines(PIDFILE).any?
+  puts "#{PIDFILE} already exists -- Exiting..."
+  exit -1
+end
+
+IMAP_Notifier.new(opts)
