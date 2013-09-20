@@ -1,4 +1,14 @@
 class IMAP_Notifier
+  def self.kill_process
+    pid = IO.readlines(PIDFILE).first.to_i
+    puts "Killing PID: #{pid}"
+    Process.kill("SIGINT", pid)
+  rescue Errno::ESRCH, Errno::ENOENT => e
+    puts "#{e.message} - Exiting..."
+  ensure
+    exit
+  end
+
   def initialize(opts={})
     config opts
     @notifier = IMAP_Notifier::Alert.new
@@ -9,6 +19,7 @@ class IMAP_Notifier
         $stdout.reopen(DEBUGFILE, 'w')
         @notifier.alert("DEBUG MODE ENABLED", "DEBUG LOGFILE: #{DEBUGFILE}")
       end
+      at_exit { File.delete(PIDFILE) if File.exists?(PIDFILE) }
       run
     end
     File.open(PIDFILE, 'w') { |f| f.write pid }

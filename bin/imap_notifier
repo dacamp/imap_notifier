@@ -46,16 +46,7 @@ opt_parser = OptionParser.new do |opt|
   end
 
   opt.on('-k', '--kill', "Kill currently running #{opt.program_name} process with SIGINT") do
-    begin
-      pid = IO.readlines(PIDFILE).first.to_i
-      puts "Killing PID: #{pid}"
-      Process.kill("SIGINT", pid)
-    rescue Errno::ESRCH, Errno::ENOENT => e
-      puts "#{e.message} - Exiting..."
-    ensure
-      File.delete(PIDFILE) if File.exists?(PIDFILE)
-    end
-    exit
+    IMAP_Notifier.kill_process
   end
 end
 
