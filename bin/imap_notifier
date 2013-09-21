@@ -24,29 +24,30 @@ opt_parser = OptionParser.new do |opt|
     opts[:debug] = true
   end
 
-  opt.on('-f', '--file FILE', "Read configuration file. [DEFAULT: ~/.imap_notifier]") do |c|
+  opt.on('-f', '--file FILE', "Read configuration file.\t[DEFAULT: ~/.imap_notifier]") do |c|
     opts[:config] = c
   end
 
-  opt.on('-s','--server STR', "Specify imap server. [Default: #{$imap_server}]") do |s|
+  opt.on('-s','--server STR', "Specify imap server.\t[Default: #{$imap_server}]") do |s|
     $imap_server = s
   end
 
   opt.on('-d','--domain STR',
-      "Specify email domain. [Default: #{$imap_server.split('.').pop(2).join('.')}]") do |d|
-    opts[:domain] = d.gsub('@','')
+      "Specify email domain.\t[Default: #{$imap_server.split('.').pop(2).join('.')}]") do |d|
+    opts[:domain] = d.gsub(/.+\@/,'')
   end
 
-  opt.on('-u','--user STR', "Specify user login. [Default: ENV['USER']]") do |d|
-    opts[:domain] = d.gsub('@','')
+  opt.on('-u','--user STR', "Specify user login.\t[Default: ENV['USER']]") do |u|
+    opts[:user] = u
   end
 
-  opt.on('-m','--max INT', "Max mail mentioned before grouping them together. [Default: #{MAX_MAIL}]") do |m|
+  opt.on('-m','--max INT', "Group notify on N or more mails. [Default: #{MAX_MAIL}]") do |m|
     opts[:max] = m.to_i
   end
 
   opt.on('-k', '--kill', "Kill currently running #{opt.program_name} process with SIGINT") do
     IMAP_Notifier.kill_process
+    exit
   end
 end
 

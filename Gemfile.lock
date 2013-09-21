@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    imap_notifier (0.2.2)
+    imap_notifier (0.2.3)
       highline
       ruby-growl
       terminal-notifier
@@ -16,7 +16,7 @@ GEM
     ruby-growl (4.0)
       uuid (~> 2.3, >= 2.3.5)
     systemu (2.5.2)
-    terminal-notifier (1.4.2)
+    terminal-notifier (1.5.1)
     uuid (2.3.7)
       macaddr (~> 1.0)
 
@@ -28,4 +28,5 @@ DEPENDENCIES
   highline
   imap_notifier!
   rake
+  ruby-growl
   terminal-notifier

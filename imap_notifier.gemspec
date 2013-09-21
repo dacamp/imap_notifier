@@ -20,6 +20,7 @@ If you're running Max OSX > 10.8, terminal-notifier is required, otherwise ruby-
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = '>= 1.9.2'
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_dependency "highline"

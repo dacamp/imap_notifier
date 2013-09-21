@@ -6,11 +6,10 @@ require 'imap_notifier/version'
 require 'imap_notifier/config'
 require 'imap_notifier/base'
 
-
 MAX_MAIL    = 5 # Max new mails mentioned before they
                 # are grouped together
 SLEEP       = 30
-ERRFILE     = '/tmp/imap_notifier.err'
+ERRFILE     = File.expand_path('~/Desktop/imap_notifier.log')
 DEBUGFILE   = '/tmp/imap_notifier.debug'
 PIDFILE     = '/tmp/imap_notifier.pid'
 $imap_server = "imap.gmail.com" # could be anything with tweaks

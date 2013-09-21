@@ -5,8 +5,6 @@ class IMAP_Notifier
     Process.kill("SIGINT", pid)
   rescue Errno::ESRCH, Errno::ENOENT => e
     puts "#{e.message} - Exiting..."
-  ensure
-    exit
   end
 
   def initialize(opts={})
@@ -15,67 +13,50 @@ class IMAP_Notifier
 
     pid = fork do
       $stderr.reopen(ERRFILE, 'w')
-      if @debug
-        $stdout.reopen(DEBUGFILE, 'w')
-        @notifier.alert("DEBUG MODE ENABLED", "DEBUG LOGFILE: #{DEBUGFILE}")
-      end
-      at_exit { File.delete(PIDFILE) if File.exists?(PIDFILE) }
+      at_exit {  self.stop }
       run
     end
     File.open(PIDFILE, 'w') { |f| f.write pid }
+  end
+
+  def run
+    begin
+      @folders.each do |f, ids|
+        alert_folder(f, ids)
+      end
+      sleep SLEEP
+    rescue EOFError
+      @imap = nil
+    rescue Exception => err
+      say_goodbye(err.class.to_s) || handle_exception(err)
+      exit
+    end while true
+  end
+
+  def alert_folder(f, ids)
+    imap.examine(f)
+    unseen    = imap.search(["UNSEEN"])
+    unalerted = unseen - ids
+
+    if unalerted.length > @max_mail
+      @notifier.alert("#{f}: #{unalerted.length} new mails", :group => f)
+    else
+      unalerted.each do |msg_id|
+        msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
+        next if ids.include?(msg.message_id)
+        @notifier.alert("#{f} #{msg.subject}", :title => "Mail from #{msg.sender.first.mailbox}", :group => msg_id)
+      end
+    end
+    @folders[f] = unseen
   end
 
   def imap
     @imap ||= _imap
   end
 
-  def run
-    begin
-      @folders.each do |f, ids|
-        imap.examine("#{f}")
-
-        p "Mailbox: #{f}" if @debug
-        unseen          = imap.search(["UNSEEN"])
-        ungrowled       = unseen - ids
-        ungrowled_count = ungrowled.length
-        p "All unseen mail ids: #{unseen}",
-        "All ungrowled mail ids: #{ungrowled}",
-        "Ungrowled count: #{ungrowled_count}" if @debug
-
-        if ungrowled_count > @max_mail
-          p "New Mail in #{f}!",
-          "New: #{ungrowled_count}\nTotal: #{unseen.length}" if @debug
-          @notifier.alert("New Mail in #{f}!", "New: #{ungrowled_count}")
-        else
-          ungrowled.each do |msg_id|
-            msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
-            next if ids.include?(msg.message_id)
-            p "Growled about #{msg.message_id}" if @debug
-            @notifier.alert("Mail from #{msg.sender.first.mailbox}", "#{msg.subject}")
-          end
-        end
-        @folders[f] = unseen
-      end
-      sleep SLEEP
-    rescue Interrupt
-      @notifier.alert("Goodbye!", '')
-      raise
-    rescue EOFError
-      imap.login(@user, @password)
-    rescue Exception => err
-      p "Class: #{err.class}",
-      "Message: #{err.message}",
-      "See #{ERRFILE} for more info." if @debug
-      @notifier.alert(err.class, err.message)
-
-      warn Time.now
-      warn @user
-      warn $imap_server
-      warn err.class
-      warn err.message
-      err.backtrace.map{ |e| warn e }
-      raise
-    end while true
+  def stop
+    IMAP_Notifier::Alert.remove
+    File.delete(PIDFILE) if File.exists?(PIDFILE)
   end
 
   private
@@ -86,7 +67,20 @@ class IMAP_Notifier
   def _imap
     imap = Net::IMAP.new($imap_server, { :port => 993, :ssl => true } )
     imap.login(@user, @password)
-    @notifier.alert("User connected to #{@domain}!", "USER: #{@user}")
+    @notifier.alert("#{@user} connected!", :group => @domain)
     return imap
+  end
+
+  def say_goodbye(klass)
+    return if !(klass.eql? "Interrupt")
+    @notifier.alert("Goodbye!", :group => @domain)
+    File.delete(ERRFILE) if File.exists?(ERRFILE)
+  end
+
+  def handle_exception(err)
+    @notifier.alert(err.message, :title => err.class, :open => "file://#{ERRFILE}")
+    warn("#{Time.now} - #{@user}")
+    warn("#{err.class}: #{err.message}")
+    err.backtrace.map{ |e| warn e }
   end
 end

@@ -1,9 +1,13 @@
 require 'terminal-notifier'
 
 class IMAP_Notifier::Alert
-  include TerminalNotifier
+  def self.remove
+    return if (msgs = TerminalNotifier.list).nil?
+    msgs.map{ |a| TerminalNotifier.remove a[:group]  }
+  end
 
-  def alert(title,body)
-    notify(body, :title => title)
+  def alert(body, opts={})
+    opts[:title] ||= self.class.name
+    TerminalNotifier.notify(body, opts.merge({:sender => 'com.apple.Mail'}))
   end
 end
