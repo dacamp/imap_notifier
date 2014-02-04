@@ -33,7 +33,7 @@ opt_parser = OptionParser.new do |opt|
   end
 
   opt.on('-d','--domain STR',
-      "Specify email domain.\t[Default: #{@imap_server.split('.').pop(2).join('.')}]") do |d|
+      "Specify email domain.\t[Default: #{IMAP_SERVER.split('.').pop(2).join('.')}]") do |d|
     opts[:domain] = d.gsub(/.+\@/,'')
   end
 
