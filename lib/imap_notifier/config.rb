@@ -1,12 +1,13 @@
 class IMAP_Notifier
   def config(opts={})
     read_conf opts
-    @domain   = opts[:domain] || $imap_server.split('.').pop(2).join('.')
-    @user     = "#{opts[:user]}@#{@domain}"
-    @password = opts[:password] || get_password
-    @folders  = mbox_conf opts[:folders] || ['INBOX']
-    @debug    = opts[:debug] || false
-    @max_mail = opts[:max]   || MAX_MAIL
+    @imap_server = opts[:server] || IMAP_SERVER
+    @domain      = opts[:domain] || @imap_server.split('.').pop(2).join('.')
+    @user        = "#{opts[:user]}@#{@domain}"
+    @password    = opts[:password] || get_password
+    @folders     = mbox_conf opts[:folders] || ['INBOX']
+    @debug       = opts[:debug] || false
+    @max_mail    = opts[:max]   || MAX_MAIL
   end
 
   private

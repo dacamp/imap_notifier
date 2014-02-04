@@ -12,7 +12,7 @@ SLEEP       = 30
 ERRFILE     = File.expand_path('~/Desktop/imap_notifier.log')
 DEBUGFILE   = '/tmp/imap_notifier.debug'
 PIDFILE     = '/tmp/imap_notifier.pid'
-$imap_server = "imap.gmail.com" # could be anything with tweaks
+IMAP_SERVER = "imap.gmail.com" # could be anything with tweaks
 
 if `uname`.strip == 'Darwin'
   if (OSX_VERSION = `sw_vers -productVersion`.strip) >= '10.8'

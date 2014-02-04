@@ -28,12 +28,12 @@ opt_parser = OptionParser.new do |opt|
     opts[:config] = c
   end
 
-  opt.on('-s','--server STR', "Specify imap server.\t[Default: #{$imap_server}]") do |s|
-    $imap_server = s
+  opt.on('-s','--server STR', "Specify imap server.\t[Default: #{IMAP_SERVER}]") do |s|
+    opts[:server] = s
   end
 
   opt.on('-d','--domain STR',
-      "Specify email domain.\t[Default: #{$imap_server.split('.').pop(2).join('.')}]") do |d|
+      "Specify email domain.\t[Default: #{@imap_server.split('.').pop(2).join('.')}]") do |d|
     opts[:domain] = d.gsub(/.+\@/,'')
   end
 

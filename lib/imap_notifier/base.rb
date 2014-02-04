@@ -65,7 +65,7 @@ class IMAP_Notifier
   end
 
   def _imap
-    imap = Net::IMAP.new($imap_server, { :port => 993, :ssl => true } )
+    imap = Net::IMAP.new(@imap_server, { :port => 993, :ssl => true } )
     imap.login(@user, @password)
     @notifier.alert("#{@user} connected!", :group => @domain)
     return imap
