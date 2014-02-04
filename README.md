@@ -17,8 +17,9 @@ Example ~/.imap_notifier file
      - Monitoring
      - Commits
      - Team+Status
-    user:  'han.solo'
+    user:   'han.solo'
     domain: 'example.org'
+    server: 'imap.server.com'
     password: "1H@t3BuG$!"
     max: 10
 
