@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    imap_notifier (0.2.3)
+    imap_notifier (0.2.4)
       highline
       ruby-growl
       terminal-notifier

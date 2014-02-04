@@ -1,3 +1,3 @@
 class IMAP_Notifier
-  VERSION='0.2.3'
+  VERSION='0.2.4'
 end
