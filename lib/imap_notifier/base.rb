@@ -5,6 +5,12 @@ class IMAP_Notifier
     Process.kill("SIGINT", pid)
   rescue Errno::ESRCH, Errno::ENOENT => e
     puts "#{e.message} - Exiting..."
+  ensure
+    self.delete_pid
+  end
+
+  def self.delete_pid
+    File.delete(PIDFILE) if File.exists?(PIDFILE)
   end
 
   def initialize(opts={})
@@ -29,7 +35,7 @@ class IMAP_Notifier
       @imap = nil
     rescue Exception => err
       say_goodbye(err.class.to_s) || handle_exception(err)
-      exit
+      stop
     end while true
   end
 
@@ -56,7 +62,8 @@ class IMAP_Notifier
 
   def stop
     IMAP_Notifier::Alert.remove
-    File.delete(PIDFILE) if File.exists?(PIDFILE)
+    self.class.delete_file
+    exit
   end
 
   private
@@ -74,7 +81,6 @@ class IMAP_Notifier
   def say_goodbye(klass)
     return if !(klass.eql? "Interrupt")
     @notifier.alert("Goodbye!", :group => @domain)
-    File.delete(ERRFILE) if File.exists?(ERRFILE)
   end
 
   def handle_exception(err)
