@@ -4,7 +4,14 @@ class IMAP_Notifier
     @imap_server = opts[:server] || IMAP_SERVER
     @domain      = opts[:domain] || @imap_server.split('.').pop(2).join('.')
     @user        = "#{opts[:user]}@#{@domain}"
-    @password    = opts[:password] || get_password
+    @keychain    = opts[:keychain] || false
+    if @keychain
+      $key_account = opts[:key_account] || false
+      $key_server  = opts[:key_server] || false
+      @password    = `security find-internet-password -g -a #{$key_account} -s #{$key_server} 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1;}'` || get_password
+    else
+      @password    = opts[:password] || get_password
+    end
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
     @max_mail    = opts[:max]   || MAX_MAIL
@@ -32,3 +39,4 @@ class IMAP_Notifier
     exit 1
   end
 end
+
