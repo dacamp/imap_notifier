@@ -4,11 +4,10 @@ class IMAP_Notifier
     @imap_server = opts[:server] || IMAP_SERVER
     @domain      = opts[:domain] || @imap_server.split('.').pop(2).join('.')
     @user        = "#{opts[:user]}@#{@domain}"
-    @keychain    = opts[:keychain] || false
-    if @keychain
-      $key_account = opts[:key_account] || false
-      $key_server  = opts[:key_server] || false
-      @password    = `security find-internet-password -g -a #{$key_account} -s #{$key_server} 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1;}'` || get_password
+    $key_name    = opts[:key_name] || false
+    $key_account = opts[:key_account] || false
+    if $key_name && $key_account
+      @password    = `security find-internet-password -g -a #{$key_account} -s #{$key_name} 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1;}'` || get_password
     else
       @password    = opts[:password] || get_password
     end

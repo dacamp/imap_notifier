@@ -7,7 +7,7 @@ If you're running Max OSX > 10.8, [terminal-notifier](https://github.com/alloy/t
 
 Setup
 --------
-Configure your .imap_notifier config file in your homedir or specific the flags via the command line.   Your config file must have permissions of 600, thus allowing you to put in your password if you so choose.  The config file is in YAML format and should be read in as a hash.
+Configure your .imap_notifier config file in your homedir or specific the flags via the command line.  Your config file must have permissions of 600, thus allowing you to put in your password if you so choose.  The config file is in YAML format and should be read in as a hash.
 
 
 Example ~/.imap_notifier file
@@ -22,6 +22,12 @@ Example ~/.imap_notifier file
     server: 'imap.server.com'
     password: "1H@t3BuG$!"
     max: 10
+
+
+For Keychain Access support, specify the keychain item name and account in .imap_notifier.  The item must be designated an 'Internet password' in Keychain Access.
+
+    key_name:    'keychain.name.com'
+    key_account: 'han.solo@keychain-account.com'
 
 Usage
 ---------
