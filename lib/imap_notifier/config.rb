@@ -7,9 +7,9 @@ class IMAP_Notifier
     $key_name    = opts[:key_name] || false
     $key_account = opts[:key_account] || false
     if $key_name && $key_account
-      @password    = `security find-internet-password -g -a #{$key_account} -s #{$key_name} 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1;}'` || get_password
+      @password  = keychain_access || get_password
     else
-      @password    = opts[:password] || get_password
+      @password  = opts[:password] || get_password
     end
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
@@ -19,6 +19,25 @@ class IMAP_Notifier
   private
   def mbox_conf ary
     Hash[ary.map{ |f| [f,Array.new] }]
+  end
+
+  private
+  def keychain_access
+    key = get_keychain
+    if key == ""
+      return nil
+    end
+    return key.chomp
+  end
+
+  private
+  def get_keychain
+    key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
+  end
+
+  private
+  def get_password(prompt="Enter Password: ")
+    ask(prompt) { |q| q.echo = false }
   end
 
   def read_conf opts
