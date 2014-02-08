@@ -66,11 +66,6 @@ class IMAP_Notifier
     exit
   end
 
-  private
-  def get_password(prompt="Enter Password: ")
-    ask(prompt) { |q| q.echo = false }
-  end
-
   def _imap
     imap = Net::IMAP.new(@imap_server, { :port => 993, :ssl => true } )
     imap.login(@user, @password)
