@@ -14,12 +14,15 @@ DEBUGFILE   = '/tmp/imap_notifier.debug'
 PIDFILE     = '/tmp/imap_notifier.pid'
 IMAP_SERVER = "imap.gmail.com" # could be anything with tweaks
 
-if `uname`.strip == 'Darwin'
-  if (OSX_VERSION = `sw_vers -productVersion`.strip) >= '10.8'
-    require 'imap_notifier/notifier'
-  else
-    require 'imap_notifier/growler'
-  end
+case RUBY_PLATFORM
+when /darwin-?([1][2-9]|[2-9]\d)\./
+  # darwin >= 12
+  require 'imap_notifier/notifier'
+when /darwin-?(\d|[1][01])\./
+  # darwin < 12
+  require 'imap_notifier/growler'
+when /linux/
+  require 'imap_notifier/libnotify'
 else
   raise "You must be running Mac OS X for imap_notifier to work!"
 end
