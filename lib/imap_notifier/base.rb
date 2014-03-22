@@ -62,7 +62,7 @@ class IMAP_Notifier
 
   def stop
     IMAP_Notifier::Alert.remove
-    self.class.delete_file
+    self.class.delete_pid
     exit
   end
 
