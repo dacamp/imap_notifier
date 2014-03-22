@@ -3,11 +3,15 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in imap_notifier.gemspec
 gemspec
 
-def is_mnt_lion?
-   @lion ||=  (RUBY_PLATFORM.match /(\d+)\.\d+\.\d+$/)[0].to_i >= 12
+def is_macosx_new?
+  @macosx_new ||= RUBY_PLATFORM.match(/darwin-?([1][2-9]|[2-9]\d)\./)
 end
 
-gem 'terminal-notifier', :require => is_mnt_lion?
-gem 'ruby-growl', :require => is_mnt_lion?
+def is_macosx?
+  @macosx ||= RUBY_PLATFORM.match(/darwin-?(\d|[1][01])\./)
+end
+
+gem 'terminal-notifier', :require => is_macosx_new?
+gem 'ruby-growl', :require => is_macosx?
 
 gem 'highline'
