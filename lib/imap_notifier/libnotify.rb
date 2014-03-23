@@ -6,6 +6,6 @@ class IMAP_Notifier::Alert
 
   def alert(body, opts={})
     opts[:title] ||= self.class.name
-    Libnotify.show(:body => body, :summary => opts[:title], :timeout => 2.5)
+    Libnotify.show(:body => body, :summary => opts[:title].to_s, :timeout => 5)
   end
 end
