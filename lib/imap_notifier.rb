@@ -15,7 +15,7 @@ PIDFILE     = '/tmp/imap_notifier.pid'
 IMAP_SERVER = "imap.gmail.com" # could be anything with tweaks
 
 case RUBY_PLATFORM
-when /darwin-?([1][2-9]|[2-9]\d)\./
+when /darwin-?([1][2-9]|[2-9]\d)/
   # darwin >= 12
   require 'imap_notifier/notifier'
 when /darwin-?(\d|[1][01])\./
@@ -24,5 +24,5 @@ when /darwin-?(\d|[1][01])\./
 when /linux/
   require 'imap_notifier/libnotify'
 else
-  raise "You must be running Mac OS X for imap_notifier to work!"
+  raise "You must be running Mac OS X or Linux for imap_notifier to work!"
 end

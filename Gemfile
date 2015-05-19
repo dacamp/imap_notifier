@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 def is_macosx_new?
-  @macosx_new ||= RUBY_PLATFORM.match(/darwin-?([1][2-9]|[2-9]\d)\./)
+  @macosx_new ||= RUBY_PLATFORM.match(/darwin-?([1][2-9]|[2-9]\d)/)
 end
 
 def is_macosx?
