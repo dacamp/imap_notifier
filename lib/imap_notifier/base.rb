@@ -50,7 +50,7 @@ class IMAP_Notifier
       unalerted.each do |msg_id|
         msg = imap.fetch(msg_id, "ENVELOPE")[0].attr["ENVELOPE"]
         next if ids.include?(msg.message_id)
-        @notifier.alert("#{f} #{msg.subject}", :title => "Mail from #{msg.sender.first.mailbox}", :group => msg_id)
+        @notifier.alert("#{f} #{msg.subject}", :title => "Mail from #{msg.from[0].mailbox}@#{msg.from[0].host}", :group => msg_id)
       end
     end
     @folders[f] = unseen
