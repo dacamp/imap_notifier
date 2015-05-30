@@ -28,6 +28,16 @@ For Keychain Access support, specify the keychain item name and account in .imap
 
     key_name:    'keychain.name.com'
     key_account: 'han.solo@keychain-account.com'
+    
+For [pass](http://www.passwordstore.org/) support, specify the pass-name.
+
+    pass: 'han.solo'
+
+For [1pass](https://github.com/georgebrock/1pass) support, specify the item and keychain path (if not ``~/Dropbox/1Password.agilekeychain``).
+
+    onepass:  'han.solo'
+	one_path: '/Volumes/passwords/1Password.agilekeychain'   
+
 
 Usage
 ---------
