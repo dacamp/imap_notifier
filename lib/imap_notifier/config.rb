@@ -6,11 +6,10 @@ class IMAP_Notifier
     @user        = "#{opts[:user]}@#{@domain}"
     $key_name    = opts[:key_name] || false
     $key_account = opts[:key_account] || false
-    if $key_name && $key_account
-      @password  = keychain_access || get_password
-    else
-      @password  = opts[:password] || get_password
-    end
+	$pass        = opts[:pass] || false
+	$one_path    = opts[:one_path] || "~/Dropbox/1Password.agilekeychain"
+	$onepass     = opts[:onepass] || false 
+    @password    = opts[:password] || get_password
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
     @max_mail    = opts[:max]   || MAX_MAIL
@@ -22,21 +21,22 @@ class IMAP_Notifier
   end
 
   private
-  def keychain_access
-    key = get_keychain
-    if key == ""
-      return nil
+  def get_password
+    if $key_name && $key_account
+	  key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
+    elsif $pass
+      key = %x{pass #{$pass}}
+	elsif $onepass
+	  key = %x{1pass --path "#{$one_path}" #{$onepass}} if $one_path || %x{1pass #{$onepass}} 
     end
-    return key.chomp
+	if key.nil? || key.empty?
+	  key = pass_prompt
+	end
+	return key.chomp
   end
 
   private
-  def get_keychain
-    key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
-  end
-
-  private
-  def get_password(prompt="Enter Password: ")
+  def pass_prompt(prompt="Enter Password: ")
     ask(prompt) { |q| q.echo = false }
   end
 
