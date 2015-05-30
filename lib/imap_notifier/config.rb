@@ -8,7 +8,7 @@ class IMAP_Notifier
     $key_account = opts[:key_account] || false
     $pass        = opts[:pass] || false
     $one_path    = opts[:one_path] || false
-    $onepass     = opts[:onepass] || false 
+    $onepass     = opts[:onepass] || false
     @password    = opts[:password] || get_password
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
@@ -27,7 +27,7 @@ class IMAP_Notifier
     elsif $pass
       key = %x{pass #{$pass}}
     elsif $onepass
-      key = %x{1pass #{$onepass}} if !$one_path || %x{1pass --path "#{$one_path}" #{$onepass}} 
+      key = %x{1pass #{$onepass}} if !$one_path || %x{1pass --path "#{$one_path}" #{$onepass}}
     end
     if key.nil? || key.empty?
       key = pass_prompt
@@ -41,7 +41,7 @@ class IMAP_Notifier
   end
 
   def read_conf opts
-    config = opts[:config] || "~/.imap_notifier" 
+    config = opts[:config] || "~/.imap_notifier"
     file = File.expand_path(config)
     return if ! File.exists? file
     ensure_perms file
@@ -58,4 +58,3 @@ class IMAP_Notifier
     exit 1
   end
 end
-
