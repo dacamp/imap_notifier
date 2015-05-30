@@ -41,7 +41,8 @@ class IMAP_Notifier
   end
 
   def read_conf opts
-    file = File.expand_path("~/.imap_notifier")
+    config = opts[:config] || "~/.imap_notifier" 
+    file = File.expand_path(config)
     return if ! File.exists? file
     ensure_perms file
     YAML.load(File.open(file)).each do |k,v|
