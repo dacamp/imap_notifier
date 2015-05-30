@@ -6,9 +6,9 @@ class IMAP_Notifier
     @user        = "#{opts[:user]}@#{@domain}"
     $key_name    = opts[:key_name] || false
     $key_account = opts[:key_account] || false
-	$pass        = opts[:pass] || false
-	$one_path    = opts[:one_path] || "~/Dropbox/1Password.agilekeychain"
-	$onepass     = opts[:onepass] || false 
+    $pass        = opts[:pass] || false
+    $one_path    = opts[:one_path] || false
+    $onepass     = opts[:onepass] || false 
     @password    = opts[:password] || get_password
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
@@ -23,16 +23,16 @@ class IMAP_Notifier
   private
   def get_password
     if $key_name && $key_account
-	  key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
+      key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
     elsif $pass
       key = %x{pass #{$pass}}
-	elsif $onepass
-	  key = %x{1pass --path "#{$one_path}" #{$onepass}} if $one_path || %x{1pass #{$onepass}} 
+    elsif $onepass
+      key = %x{1pass #{$onepass}} if !$one_path || %x{1pass --path "#{$one_path}" #{$onepass}} 
     end
-	if key.nil? || key.empty?
-	  key = pass_prompt
-	end
-	return key.chomp
+    if key.nil? || key.empty?
+      key = pass_prompt
+    end
+    return key.chomp
   end
 
   private
