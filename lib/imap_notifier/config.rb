@@ -27,7 +27,11 @@ class IMAP_Notifier
     elsif $pass
       key = %x{pass #{$pass}}
     elsif $onepass
-      key = %x{1pass #{$onepass}} if !$one_path || %x{1pass --path "#{$one_path}" #{$onepass}}
+      if $one_path
+        key = %x{1pass --path "#{$one_path}" #{$onepass}} 
+      else
+        key = %x{1pass #{$onepass}} 
+      end
     end
     if key.nil? || key.empty?
       key = pass_prompt
