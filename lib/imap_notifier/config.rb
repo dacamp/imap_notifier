@@ -13,6 +13,7 @@ class IMAP_Notifier
     @folders     = mbox_conf opts[:folders] || ['INBOX']
     @debug       = opts[:debug] || false
     @max_mail    = opts[:max]   || MAX_MAIL
+    @custom_pid  = get_pid_suffix(opts[:pid_suffix]) || PIDFILE
   end
 
   private
@@ -21,6 +22,17 @@ class IMAP_Notifier
   end
 
   private
+  def get_pid_suffix(suffix)
+    if suffix != nil
+      pidfile = ""
+      pidparts = PIDFILE.split(".")
+      pidparts.delete("pid")
+      pidparts.push(suffix)
+      return pidparts.join("_") + ".pid"
+    end
+    return nil      
+  end
+
   def get_password
     if $key_name && $key_account
       key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}

@@ -1,16 +1,32 @@
 class IMAP_Notifier
   def self.kill_process
-    pid = IO.readlines(PIDFILE).first.to_i
+    matchingPids = Dir['/tmp/imap_notifier*.pid']
+    pid = 0
+    pidFile = ""
+    if matchingPids.length > 1
+      prompts = ["[Q] Cancel"]
+      matchingPids.each_with_index do |pFile, i|
+        prompts.push("["+i.to_s+"] "+pFile)
+      end
+      pidIndex = ask("Select PID by number\n" + prompts.join("\n")) { |q|
+        q.validate = /^[0-#{matchingPids.length-1},q,Q]{1}$/
+      }
+      return if pidIndex.downcase == "q"
+      pidFile = Dir['/tmp/imap_notifier*.pid'][pidIndex.to_i]
+    else
+      pidFile = Dir['/tmp/imap_notifier*.pid'][0]
+    end
+      pid = IO.readlines(pidFile).first.to_i
     puts "Killing PID: #{pid}"
     Process.kill("SIGINT", pid)
   rescue Errno::ESRCH, Errno::ENOENT => e
     puts "#{e.message} - Exiting..."
   ensure
-    self.delete_pid
+    self.delete_pid(pidFile)
   end
 
-  def self.delete_pid
-    File.delete(PIDFILE) if File.exists?(PIDFILE)
+  def self.delete_pid(pidFile)
+    File.delete(pidFile) if File.exists?(pidFile)
   end
 
   def initialize(opts={})
@@ -22,7 +38,7 @@ class IMAP_Notifier
       at_exit {  self.stop }
       run
     end
-    File.open(PIDFILE, 'w') { |f| f.write pid }
+    File.open(@custom_pid, 'w') { |f| f.write pid }
   end
 
   def run
