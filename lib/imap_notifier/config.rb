@@ -23,14 +23,8 @@ class IMAP_Notifier
 
   private
   def get_pid_suffix(suffix)
-    if suffix != nil
-      pidfile = ""
-      pidparts = PIDFILE.split(".")
-      pidparts.delete("pid")
-      pidparts.push(suffix)
-      return pidparts.join("_") + ".pid"
-    end
-    return nil      
+    return if suffix.nil?
+    return PIDFILE.sub(/\.pid/,"_#{suffix}.pid")
   end
 
   def get_password

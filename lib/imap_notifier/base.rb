@@ -1,20 +1,18 @@
 class IMAP_Notifier
   def self.kill_process
-    matchingPids = Dir['/tmp/imap_notifier*.pid']
-    pid = 0
-    pidFile = ""
-    if matchingPids.length > 1
+    matching_pids = Dir['/tmp/imap_notifier*.pid']
+    if matching_pids.length > 1
       prompts = ["[Q] Cancel"]
-      matchingPids.each_with_index do |pFile, i|
-        prompts.push("["+i.to_s+"] "+pFile)
+      matching_pids.each_with_index do |p_file, i|
+        prompts.push("[#{i}] #{p_file}")
       end
       pidIndex = ask("Select PID by number\n" + prompts.join("\n")) { |q|
-        q.validate = /^[0-#{matchingPids.length-1},q,Q]{1}$/
+        q.validate = /^[0-#{matching_pids.length-1},q,Q]{1}$/
       }
       return if pidIndex.downcase == "q"
       pidFile = Dir['/tmp/imap_notifier*.pid'][pidIndex.to_i]
     else
-      pidFile = Dir['/tmp/imap_notifier*.pid'][0]
+      pidFile = Dir['/tmp/imap_notifier*.pid'].first
     end
       pid = IO.readlines(pidFile).first.to_i
     puts "Killing PID: #{pid}"
