@@ -29,6 +29,12 @@ class IMAP_Notifier
 
   def initialize(opts={})
     config opts
+
+    if File.exists?(@custom_pid) && IO.readlines(@custom_pid).any?
+      puts "#{@custom_pid} already exists -- Exiting..."
+      exit @ignore_exit_code ? 0 : 1
+    end
+
     @notifier = IMAP_Notifier::Alert.new
 
     pid = fork do

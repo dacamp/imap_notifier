@@ -22,6 +22,7 @@ Example ~/.imap_notifier file
     server: 'imap.server.com'
     password: "1H@t3BuG$!"
     max: 10
+    ignore_exit_code: true  #defaults to false. When true, returns 0 instead of 1 on existing pidfile exit
 
 
 For Keychain Access support, specify the keychain item name and account in .imap_notifier.  The item must be designated an 'Internet password' in Keychain Access.
