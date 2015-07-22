@@ -52,10 +52,4 @@ opt_parser = OptionParser.new do |opt|
 end
 
 opt_parser.parse!
-
-if File.exists?(PIDFILE) && IO.readlines(PIDFILE).any?
-  puts "#{PIDFILE} already exists -- Exiting..."
-  exit -1
-end
-
 IMAP_Notifier.new(opts)
