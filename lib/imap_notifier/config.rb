@@ -1,18 +1,20 @@
 class IMAP_Notifier
   def config(opts={})
     read_conf opts
-    @imap_server = opts[:server] || IMAP_SERVER
-    @domain      = opts[:domain] || @imap_server.split('.').pop(2).join('.')
-    @user        = "#{opts[:user]}@#{@domain}"
-    $key_name    = opts[:key_name] || false
-    $key_account = opts[:key_account] || false
-    $pass        = opts[:pass] || false
-    $one_path    = opts[:one_path] || false
-    $onepass     = opts[:onepass] || false
-    @password    = opts[:password] || get_password
-    @folders     = mbox_conf opts[:folders] || ['INBOX']
-    @debug       = opts[:debug] || false
-    @max_mail    = opts[:max]   || MAX_MAIL
+    @imap_server      = opts[:server] || IMAP_SERVER
+    @domain           = opts[:domain] || @imap_server.split('.').pop(2).join('.')
+    @user             = "#{opts[:user]}@#{@domain}"
+    $key_name         = opts[:key_name] || false
+    $key_account      = opts[:key_account] || false
+    $pass             = opts[:pass] || false
+    $one_path         = opts[:one_path] || false
+    $onepass          = opts[:onepass] || false
+    @password         = opts[:password] || get_password
+    @folders          = mbox_conf opts[:folders] || ['INBOX']
+    @debug            = opts[:debug] || false
+    @max_mail         = opts[:max]   || MAX_MAIL
+    @ignore_exit_code = opts[:ignore_exit_code].to_s == 'true'
+    @custom_pid       = get_pid_suffix(opts[:pid_suffix]) || PIDFILE
   end
 
   private
@@ -21,6 +23,11 @@ class IMAP_Notifier
   end
 
   private
+  def get_pid_suffix(suffix)
+    return if suffix.nil?
+    return PIDFILE.sub(/\.pid/,"_#{suffix}.pid")
+  end
+
   def get_password
     if $key_name && $key_account
       key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}
