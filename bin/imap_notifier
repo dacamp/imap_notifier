@@ -45,6 +45,10 @@ opt_parser = OptionParser.new do |opt|
     opts[:max] = m.to_i
   end
 
+  opt.on('-p','--pid STR', "PID file path. [Default: #{PIDFILE}]") do |m|
+    opts[:pid] = m.to_i
+  end
+
   opt.on('-k', '--kill', "Kill currently running #{opt.program_name} process with SIGINT") do
     IMAP_Notifier.kill_process
     exit

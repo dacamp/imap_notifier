@@ -14,7 +14,7 @@ class IMAP_Notifier
     @debug            = opts[:debug] || false
     @max_mail         = opts[:max]   || MAX_MAIL
     @ignore_exit_code = opts[:ignore_exit_code].to_s == 'true'
-    @custom_pid       = get_pid_suffix(opts[:pid_suffix]) || PIDFILE
+    @custom_pid       = opts[:pid] || PIDFILE
   end
 
   private
@@ -23,11 +23,6 @@ class IMAP_Notifier
   end
 
   private
-  def get_pid_suffix(suffix)
-    return if suffix.nil?
-    return PIDFILE.sub(/\.pid/,"_#{suffix}.pid")
-  end
-
   def get_password
     if $key_name && $key_account
       key = %x{security find-internet-password -w -a #{$key_account} -s #{$key_name}}

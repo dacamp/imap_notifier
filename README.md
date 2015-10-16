@@ -22,6 +22,7 @@ Example ~/.imap_notifier file
     server: 'imap.server.com'
     password: "1H@t3BuG$!"
     max: 10
+    pid: /tmp/imap_notifier.1.pid  # defaults to /tmp/imap_notifier.pid set this to initialize multiple imap_notifier instances
     ignore_exit_code: true  #defaults to false. When true, returns 0 instead of 1 on existing pidfile exit
 
 
